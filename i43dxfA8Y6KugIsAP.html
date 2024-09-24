@@ -1,0 +1,382 @@
+<html><head><base href="https://cosmic-ton-roulette.games/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic TON Roulette</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
+
+    :root {
+        --primary-color: #00f5d4;
+        --secondary-color: #7b2cbf;
+        --background-color: #0a0a2a;
+        --text-color: #e0e0e0;
+        --accent-color: #ff6b6b;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 20%);
+        overflow-x: hidden;
+    }
+
+    .container {
+        max-width: 800px;
+        width: 100%;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--primary-color);
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+    }
+
+    .roulette-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 0 auto 2rem;
+    }
+
+    .roulette {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(
+            var(--primary-color) 0deg 60deg,
+            var(--secondary-color) 60deg 120deg,
+            #48dbfb 120deg 180deg,
+            #ff9ff3 180deg 240deg,
+            #54a0ff 240deg 300deg,
+            var(--accent-color) 300deg 360deg
+        );
+        box-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+        transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .roulette::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: calc(50% - 10px);
+        width: 20px;
+        height: 20px;
+        background: white;
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    }
+
+    .roulette::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 80%;
+        background-color: var(--background-color);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    .cosmic-debris {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background-color: white;
+        border-radius: 50%;
+        opacity: 0.7;
+        animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(300px, -300px) rotate(360deg); }
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    button {
+        font-family: 'Orbitron', sans-serif;
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        border: none;
+        padding: 12px 24px;
+        font-size: 1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 6px rgba(0, 245, 212, 0.2);
+    }
+
+    button:hover {
+        background-color: #00d4b6;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 245, 212, 0.3);
+    }
+
+    button:disabled {
+        background-color: #4a4a6a;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    #result, #balance, #timer {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    #result {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--accent-color);
+    }
+
+    #balance {
+        font-size: 2rem;
+        color: var(--primary-color);
+    }
+
+    #timer {
+        font-size: 1.2rem;
+        color: var(--secondary-color);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: var(--background-color);
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid var(--primary-color);
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+    }
+
+    .close {
+        color: var(--accent-color);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .roulette-container {
+            width: 250px;
+            height: 250px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Cosmic TON Roulette</h1>
+    <div class="roulette-container">
+        <div class="roulette" id="roulette"></div>
+    </div>
+    <div id="result"></div>
+    <div id="balance">Balance: 0 TON</div>
+    <div id="timer"></div>
+    <div class="button-container">
+        <button id="watchAdButton">Watch Ad to Spin</button>
+        <button id="boostTelegramButton">Boost Telegram</button>
+        <button id="buySpinsButton">Buy 10 Spins</button>
+        <button id="withdrawButton" disabled>Withdraw</button>
+    </div>
+</div>
+
+<div id="adModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Watching Ad</h2>
+        <p>Please wait while the ad is loading...</p>
+        <div id="adProgress"></div>
+    </div>
+</div>
+
+<script>
+let balance = 0;
+let cooldownTime = 0;
+const cooldownDuration = 10800; // 3 hours in seconds
+
+const roulette = document.getElementById('roulette');
+const result = document.getElementById('result');
+const balanceDisplay = document.getElementById('balance');
+const timerDisplay = document.getElementById('timer');
+const watchAdButton = document.getElementById('watchAdButton');
+const boostTelegramButton = document.getElementById('boostTelegramButton');
+const buySpinsButton = document.getElementById('buySpinsButton');
+const withdrawButton = document.getElementById('withdrawButton');
+
+const adModal = document.getElementById('adModal');
+const closeModal = document.getElementsByClassName('close')[0];
+
+watchAdButton.addEventListener('click', watchAdAndSpin);
+boostTelegramButton.addEventListener('click', boostTelegram);
+buySpinsButton.addEventListener('click', buySpins);
+withdrawButton.addEventListener('click', withdraw);
+
+closeModal.onclick = function() {
+    adModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == adModal) {
+        adModal.style.display = "none";
+    }
+}
+
+function createCosmicDebris() {
+    const debris = document.createElement('div');
+    debris.classList.add('cosmic-debris');
+    debris.style.left = Math.random() * 100 + 'vw';
+    debris.style.top = Math.random() * 100 + 'vh';
+    document.body.appendChild(debris);
+
+    setTimeout(() => {
+        debris.remove();
+    }, 20000);
+}
+
+setInterval(createCosmicDebris, 1000);
+
+function watchAdAndSpin() {
+    if (cooldownTime === 0) {
+        adModal.style.display = "block";
+        const adProgress = document.getElementById('adProgress');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            adProgress.textContent = `Ad progress: ${progress}%`;
+            if (progress >= 100) {
+                clearInterval(interval);
+                adModal.style.display = "none";
+                spin();
+                startCooldown();
+            }
+        }, 500);
+    } else {
+        alert('Please wait for the cooldown to finish before spinning again.');
+    }
+}
+
+function spin() {
+    const rotation = Math.floor(Math.random() * 360) + 720;
+    roulette.style.transform = `rotate(${rotation}deg)`;
+    
+    setTimeout(() => {
+        const winAmount = (Math.random() * (0.001 - 0.00001) + 0.00001).toFixed(8);
+        balance += parseFloat(winAmount);
+        result.textContent = `You won ${winAmount} TON!`;
+        updateBalance();
+    }, 5000);
+}
+
+function updateBalance() {
+    balanceDisplay.textContent = `Balance: ${balance.toFixed(8)} TON`;
+    withdrawButton.disabled = balance < 100;
+}
+
+function startCooldown() {
+    cooldownTime = cooldownDuration;
+    updateCooldown();
+}
+
+function updateCooldown() {
+    if (cooldownTime > 0) {
+        const hours = Math.floor(cooldownTime / 3600);
+        const minutes = Math.floor((cooldownTime % 3600) / 60);
+        const seconds = cooldownTime % 60;
+        timerDisplay.textContent = `Next spin in: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        cooldownTime--;
+        setTimeout(updateCooldown, 1000);
+    } else {
+        timerDisplay.textContent = '';
+        watchAdButton.disabled = false;
+    }
+}
+
+function boostTelegram() {
+    const url = 'https://t.me/share/url?url=' + encodeURIComponent('https://cosmic-ton-roulette.games') + '&text=' + encodeURIComponent('Join me in the Cosmic TON Roulette adventure!');
+    window.open(url, '_blank');
+    setTimeout(() => {
+        alert('Thanks for boosting our Telegram! A cosmic boost has been added to your next spin.');
+    }, 5000);
+}
+
+function buySpins() {
+    if (balance >= 0.0001) {
+        balance -= 0.0001;
+        updateBalance();
+        alert('You bought 10 cosmic spins! These will be used automatically on your next 10 eligible spins.');
+    } else {
+        alert('Not enough cosmic energy (TON) to buy spins.');
+    }
+}
+
+function withdraw() {
+    if (balance >= 100) {
+        alert(`Initiating interstellar transfer of ${balance.toFixed(8)} TON to your cosmic wallet.`);
+        balance = 0;
+        updateBalance();
+    } else {
+        alert('Minimum withdrawal amount is 100 TON. Keep spinning to reach the stars!');
+    }
+}
+
+updateBalance();
+watchAdButton.disabled = false;
+</script>
+</body></html>
